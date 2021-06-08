@@ -6,6 +6,7 @@ const socketio = require('socket.io');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const md5 = require('md5');
+const flash = require('connect-flash');
 
 // load environment variables
 require('dotenv').config();
@@ -28,6 +29,7 @@ app.set('view engine', 'ejs');
 // load assets
 app.use("/css", express.static(path.join(__dirname, "assets", "css")));
 app.use("/js", express.static(path.join(__dirname, "assets", "js")));
+app.use('/img', express.static(path.join(__dirname, 'assets', 'img')));
 
 // middlewares
 app.use(morgan('tiny'));
@@ -41,6 +43,8 @@ app.use(session({
     saveUninitialized: false,
     store: store
 }))
+
+app.use(flash());
 
 // routes
 app.get('/', async (req, res) => {
@@ -59,8 +63,10 @@ app.get('/login', (req, res) => {
     // check if logged in, redirect to dashboard if so
     if (req.session.isAuth)
         res.redirect('/dashboard');
-    else
-        res.render('login');
+    else {
+        res.render('login', {msg: req.flash('msg')} );
+    }
+        
 });
 
 app.get('/register', (req, res) => {
@@ -80,18 +86,21 @@ app.post('/login', async (req, res) => {
         .collection('users')
         .findOne({username: req.body.username, password: md5(req.body.password)});
         
-        if (account == null)
-            res.redirect('/login')
+        if (account == null) {
+            req.flash('msg', "Invalid credentials or account doesn't exist.");
+            res.redirect('/login');
+        }
         else {
             // add necessary session variables
             req.session.username = req.body.username;
             req.session.isAuth = true;
 
-            res.redirect('/dashboard');
+            res.redirect('/');
         }
     }
-    else 
+    else
         res.redirect('/login');
+        
 })
 
 app.post('/register', async (req, res) => {
@@ -115,7 +124,7 @@ app.post('/register', async (req, res) => {
             req.session.username = req.body.username;
             req.session.isAuth = true;
 
-            res.redirect('/dashboard');
+            res.redirect('/');
         }
         else
             res.redirect('/register');
@@ -128,8 +137,8 @@ app.get('/dashboard', (req, res) => {
     // check if not logged in, redirect to index if so
     if (!req.session.isAuth)
         res.redirect('/');
-
-    res.render('user/dashboard');
+    else
+        res.render('user/dashboard');
 })
 
 // logout
@@ -144,7 +153,11 @@ app.post('/dashboard', (req, res) => {
 
 // routes CHAT
 app.get('/chat', (req, res) => {
-    res.render('chat', {username: req.session.username});
+    // check if not logged in, redirect to index if so
+    if (!req.session.isAuth)
+        res.redirect('/');
+    else
+        res.render('chat', {username: req.session.username});
 });
 
 
