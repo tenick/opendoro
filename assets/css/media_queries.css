@@ -1,0 +1,47 @@
+/* P H O N E S */
+@media only screen and (max-width: 550px) {
+    .container {
+        max-width: 100%;
+        border-radius: 0;
+    }
+}
+
+/* T A B L E T */
+@media only screen and (max-width: 1060px) {
+    .pomodoro-container {
+        flex-direction: column;
+    }
+
+    .countdown-area {
+        width: 100%;
+        text-align: center;
+    }
+    
+    .todolist-area {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 600px) {
+    .logo {
+        font-size: 2em;
+    }
+    .header ul {
+        font-size: 3.5vw;
+    }
+
+    .msg-pnl {
+        width: 100%;
+        border-radius: 0;
+    }
+
+    .chat-panel {
+        max-width: 100%;
+        border-radius: 0;
+        padding: 1em 0;
+    }
+
+    input[id='message'] {
+        border-radius: 0;
+    }
+}

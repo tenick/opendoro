@@ -1,0 +1,36 @@
+.pomodoro-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-family: monospace;
+}
+
+.countdown-watch {
+    font-size: 5rem;
+    font-weight: bold;
+}
+
+.countdown-area {
+    width: 45%;
+    text-align: center;
+}
+
+.todolist-area {
+    width: 45%;
+}
+
+.btn {
+    border-radius: 0.3em;
+    font-family: inherit;
+    font-size: 1.5rem;
+    margin: 0.3em 1em;
+    padding: 0em 2em;
+    border: 0px;
+    transition: 0.4s;
+    cursor: pointer;
+}
+
+.btn:hover {
+    background-color: red;
+    color: white;
+}
