@@ -9,8 +9,12 @@
     <title>Login | opendoro</title>
 </head>
 <body>
+    <% if (errMsg) { %>
+        <%- include('_msg/_error-msg', {msg: errMsg}) %>
+    <% } else { %>
+        <%- include('_msg/_success-msg', {msg: succMsg}) %>
+    <% } %>
     <div class="container">
-        <div id="message-notif"><%= msg %></div>
         <div class="login-header">
             <div class="logo">
                 opendoro

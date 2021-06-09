@@ -1,0 +1,20 @@
+<style>
+    #message-notif {
+    text-align: center;
+    background-color: red;
+    color: white;
+    cursor: pointer;
+    transition: 0.4s;
+    }
+    
+    #message-notif:hover {
+        background-color:#ff7575;
+    }
+</style>
+<div id="message-notif"><b><%= msg %></b></div>
+<script>
+    var msg = document.getElementById('message-notif');
+    msg.addEventListener('click', () => {
+        msg.style.display = 'none';
+    })
+</script>

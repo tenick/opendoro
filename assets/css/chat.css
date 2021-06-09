@@ -52,7 +52,7 @@ a {
     flex-direction: column;
     background-color: #f0cda8;
     margin: 0 auto;
-    width: 960px;
+    width: 1100px;
     max-width: 90%;
     box-sizing: border-box;
     padding: 1em;
@@ -61,11 +61,67 @@ a {
     box-shadow: 0px 10px #4f6480;
 }
 
+.users-and-chat-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.users-pnl-container {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 30%;
+}
+
+#users-pnl {
+    height: 100%;
+    overflow-y: auto;
+    color: white;
+    font-size: 1.25rem;
+    margin-bottom: 1em;
+}
+
+.msg-pnl-container {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    width: 67%;
+}
+
 .msg-pnl {
     width: 100%;
     background-color: white;
     border-radius: 1em;
     margin-bottom: 1em;
+    padding: .5em 1em;
+    box-sizing: border-box;
+    overflow-y: auto;
+    height: 60vh;
+}
+
+#chat-msg-container {
+    text-align: left;
+    color: black;
+    font-size: 1.25rem;
+}
+
+#chat-handle {
+
+}
+
+#chat-msg {
+
+}
+
+#chat-server-msg-container {
+    text-align: center;
+    background-color: #ccc;
+    color: red;
+    font-size: 1.25rem;
+}
+
+#chat-server-msg {
+    
 }
 
 input {
@@ -95,7 +151,7 @@ button {
     box-shadow: 0px 5px #4f6480;
 }
 
-input[type='submit']:hover {
+button:hover {
     background-color: red;
     color: white;
 }

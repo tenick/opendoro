@@ -11,6 +11,11 @@
     <title>opendoro</title>
 </head>
 <body>
+    <% if (errMsg.length != 0) { %>
+        <%- include('_msg/_error-msg', {msg: errMsg}); %>
+    <% } if (succMsg.length != 0) { %>
+        <%- include('_msg/_success-msg', {msg: succMsg}); %>
+    <% } %>
     <div class="header">
         <div class="logo">
             opendoro

@@ -54,7 +54,10 @@ app.get('/', async (req, res) => {
     
     const data = {authenticated: authenticated, username: req.session.username};
 
-    res.render('index', data);
+    const err = req.flash('error-msg');
+    const succ = req.flash('success-msg');
+
+    res.render('index', { ...data, ...{errMsg: err, succMsg: succ}});
     console.log(req.session);
     console.log(req.session.id);
 })
@@ -64,7 +67,7 @@ app.get('/login', (req, res) => {
     if (req.session.isAuth)
         res.redirect('/dashboard');
     else {
-        res.render('login', {msg: req.flash('msg')} );
+        res.render('login', {errMsg: req.flash('error-msg'), succMsg: req.flash('success-msg')} );
     }
         
 });
@@ -74,7 +77,7 @@ app.get('/register', (req, res) => {
     if (req.session.isAuth)
         res.redirect('/dashboard');
     else
-        res.render('register');
+        res.render('register', {errMsg: req.flash('error-msg'), succMsg: req.flash('success-msg')} );
 });
 
 // routes USER
@@ -87,7 +90,7 @@ app.post('/login', async (req, res) => {
         .findOne({username: req.body.username, password: md5(req.body.password)});
         
         if (account == null) {
-            req.flash('msg', "Invalid credentials or account doesn't exist.");
+            req.flash('error-msg', "Invalid credentials or account doesn't exist.");
             res.redirect('/login');
         }
         else {
@@ -95,6 +98,7 @@ app.post('/login', async (req, res) => {
             req.session.username = req.body.username;
             req.session.isAuth = true;
 
+            req.flash('success-msg', `Welcome back, ${req.body.username}`);
             res.redirect('/');
         }
     }
@@ -123,11 +127,14 @@ app.post('/register', async (req, res) => {
             // add necessary session variables
             req.session.username = req.body.username;
             req.session.isAuth = true;
-
+            
+            req.flash('success-msg', `Successfully registered! Welcome, ${req.body.username}`);
             res.redirect('/');
         }
-        else
+        else {
+            req.flash('error-msg', "Email or Username is already in use.");
             res.redirect('/register');
+        }
     }
     else
         res.redirect('/register');
@@ -171,13 +178,30 @@ db.connect(() => {
     })
 
     // setup socket
+    var users = {}
     var io = socketio(server);
     io.on('connection', (socket) => {
-        console.log(`Connection made on socket: ${socket.id}`);
+        console.log(`Connection made by ${socket.handshake.query.username} on socket: ${socket.id}`);
+
+        if (socket.handshake.query.username in users) 
+            users[socket.handshake.query.username] += 1;
+        else {
+            users[socket.handshake.query.username] = 1
+            io.sockets.emit('new-user-connection', {newUser: socket.handshake.query.username});
+            io.sockets.emit('update-user-list', users);
+        }
 
         // socket events
         socket.on('disconnect', () => {
-            console.log(`disconnected on socket: ${socket.id}`);
+            if (users[socket.handshake.query.username] == 1) {
+                io.sockets.emit('user-disconnection', {user: socket.handshake.query.username});
+                delete users[socket.handshake.query.username];
+                io.sockets.emit('update-user-list', users);
+            }
+            else 
+                users[socket.handshake.query.username] -= 1;
+
+            console.log(`${socket.handshake.query.username} disconnected on socket: ${socket.id}`);
         });
 
         socket.on('chat', (data) => {
