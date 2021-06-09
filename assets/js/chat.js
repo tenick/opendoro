@@ -9,7 +9,7 @@ var socket = io.connect(window.location.origin, {query: {username: username}});
 
 // add enter key event in message input
 msgInput.addEventListener("keyup", (event) => {
-    if (event.code == 'Enter')
+    if (event.code == 'Enter' || event.code == 13)
         sendBtn.click();
 });
 
