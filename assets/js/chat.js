@@ -31,13 +31,11 @@ socket.on('chat', (data) => {
 // if a new user connected
 socket.on('new-user-connection', (data) => {
     msgPanel.innerHTML += '<div id="chat-server-msg-container">'+'<span id="chat-server-msg">'+data.newUser+" joined the chat</span>"+'</div>'
-    //updateUserList();
 });
 
 // if a user disconnected
 socket.on('user-disconnection', (data) => {
     msgPanel.innerHTML += '<div id="chat-server-msg-container">'+'<span id="chat-server-msg">'+data.user+" left the chat</span>"+'</div>'
-    //updateUserList();
 });
 
 socket.on('update-user-list', (data) => {
