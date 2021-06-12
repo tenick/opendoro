@@ -2,8 +2,8 @@ var startTimerBtn = document.getElementById('start-timer-btn');
 var stopTimerBtn = document.getElementById('stop-timer-btn');
 var countdownWatchDiv = document.getElementById("countdown-watch")
 
-const STUDY_SECONDS = 5;
-const BREAK_SECONDS = 3;
+const STUDY_SECONDS = 1500;
+const BREAK_SECONDS = 300;
 countdownWatchDiv.innerHTML = secsToMMSS(STUDY_SECONDS);
 
 var currStudySecs = STUDY_SECONDS;
