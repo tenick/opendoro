@@ -1,21 +1,21 @@
 const path = require('path');
 const express = require('express');
 const morgan = require('morgan');
-const MongoClient = require('mongodb').MongoClient;
+const mongoose = require('mongoose');
 const socketio = require('socket.io');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const md5 = require('md5');
 const flash = require('connect-flash');
 
+// models
+const User = require('./models/user');
+
 // load environment variables
 require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// MongoDB Database
-const db = new MongoClient(process.env.DB_URL, { useUnifiedTopology: true });
 
 // session store in MongoDB
 const store = new MongoStore({
@@ -69,7 +69,6 @@ app.get('/login', (req, res) => {
     else {
         res.render('login', {errMsg: req.flash('error-msg'), succMsg: req.flash('success-msg')} );
     }
-        
 });
 
 app.get('/register', (req, res) => {
@@ -85,11 +84,9 @@ app.get('/register', (req, res) => {
 app.post('/login', async (req, res) => {
     // check if login-submit is set
     if (req.body['login-submit']) {
-        const account = await db.db('opendoro')
-        .collection('users')
-        .findOne({username: req.body.username, password: md5(req.body.password)});
+        const account = await User.findOne({username: req.body.username, password: md5(req.body.password)});
         
-        if (account == null) {
+        if (!account) {
             req.flash('error-msg', "Invalid credentials or account doesn't exist.");
             res.redirect('/login');
         }
@@ -104,25 +101,22 @@ app.post('/login', async (req, res) => {
     }
     else
         res.redirect('/login');
-        
 })
 
 app.post('/register', async (req, res) => {
     // check if register-submit is set
     if (req.body['register-submit']) {
-        const emailUniqueCheck = await db.db('opendoro')
-        .collection('users')
-        .findOne({email: req.body.email});
-
-        const usernameUniqueCheck = await db.db('opendoro')
-        .collection('users')
-        .findOne({username: req.body.username});
+        const emailUniqueCheck = await User.findOne({email: req.body.email});
+        const usernameUniqueCheck = await User.findOne({username: req.body.username});
         
-        // add account to database
-        if (emailUniqueCheck == null && usernameUniqueCheck == null) {
-            await db.db('opendoro')
-            .collection('users')
-            .insertOne({email: req.body.email, username: req.body.username, password: md5(req.body.password)});
+        if (!emailUniqueCheck && !usernameUniqueCheck) {
+            User.create({
+                email: req.body.email, 
+                username: req.body.username, 
+                password: md5(req.body.password)
+            })
+            .then(val => console.log(`Successfully added ${val} to database!`))
+            .catch(err => console.log(err));
 
             // add necessary session variables
             req.session.username = req.body.username;
@@ -169,7 +163,8 @@ app.get('/chat', (req, res) => {
 
 
 // MongoDB connect then start server and setup socket
-db.connect(() => {
+mongoose.connect(process.env.DB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
+.then(() => {
     console.log("Database connected");
 
     // start server
@@ -209,4 +204,5 @@ db.connect(() => {
             io.sockets.emit('chat', data);
         });
     });
-});
+})
+.catch(err => console.log(err));
